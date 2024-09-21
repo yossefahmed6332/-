@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Lumbar Vertebra</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Create scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting setup
+        const ambientLight = new THREE.AmbientLight(0x404040); // Soft ambient light
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2, 5, 5);
+        scene.add(directionalLight);
+
+        // Create the main lumbar vertebrae body
+        const vertebraBodyGeometry = new THREE.BoxGeometry(3, 1, 2);
+        const vertebraBodyMaterial = new THREE.MeshPhongMaterial({ color: 0xF5DEB3 });
+        const vertebraBody = new THREE.Mesh(vertebraBodyGeometry, vertebraBodyMaterial);
+        scene.add(vertebraBody);
+
+        // Add details: transverse processes (side parts of vertebrae)
+        const transverseProcessGeometry = new THREE.BoxGeometry(0.5, 0.5, 5);
+        const transverseProcessMaterial = new THREE.MeshPhongMaterial({ color: 0xF5DEB3 });
+        const leftTransverseProcess = new THREE.Mesh(transverseProcessGeometry, transverseProcessMaterial);
+        leftTransverseProcess.position.set(-2, 0, 0);
+        const rightTransverseProcess = new THREE.Mesh(transverseProcessGeometry, transverseProcessMaterial);
+        rightTransverseProcess.position.set(2, 0, 0);
+        vertebraBody.add(leftTransverseProcess);
+        vertebraBody.add(rightTransverseProcess);
+
+        // Add spinal process (the back projection of the vertebrae)
+        const spinalProcessGeometry = new THREE.BoxGeometry(0.5, 2, 0.5);
+        const spinalProcessMaterial = new THREE.MeshPhongMaterial({ color: 0xF5DEB3 });
+        const spinalProcess = new THREE.Mesh(spinalProcessGeometry, spinalProcessMaterial);
+        spinalProcess.position.set(0, 1, -1);
+        vertebraBody.add(spinalProcess);
+
+        // Add intervertebral disc (to represent the cushion between vertebrae)
+        const discGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.5, 32);
+        const discMaterial = new THREE.MeshPhongMaterial({ color: 0x8B5A2B });
+        const intervertebralDisc = new THREE.Mesh(discGeometry, discMaterial);
+        intervertebralDisc.rotation.x = Math.PI / 2;
+        intervertebralDisc.position.y = -0.75;
+        vertebraBody.add(intervertebralDisc);
+
+        // Position camera
+        camera.position.z = 8;
+
+        // Add orbit controls for user interaction
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Smoother controls
+        controls.dampingFactor = 0.05;
+
+        // Add auto rotation for fun visualization
+        function animate() {
+            requestAnimationFrame(animate);
+            vertebraBody.rotation.x += 0.005;
+            vertebraBody.rotation.y += 0.01;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Adjust scene on window resize
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
